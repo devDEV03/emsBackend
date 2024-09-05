@@ -3,6 +3,7 @@ package com.emsbackend.emsbackend.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Entity
 @Data
@@ -10,12 +11,11 @@ import lombok.*;
 @NoArgsConstructor
 @Setter
 @Getter
-@Table(name = "employees")
+@Document(collection = "employee")
 public class Employee {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @Column(name = "first_name")
     private String firstName;
@@ -25,4 +25,9 @@ public class Employee {
 
     @Column(name = "email_id",nullable = false,unique = true)
     private String email;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department;
+
 }

@@ -2,17 +2,19 @@ package com.emsbackend.emsbackend.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Data
-@Table(name = "departments")
+@Document(collection = "departments")
 public class Department {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @Column(name = "department_name")
     private String departmentName;

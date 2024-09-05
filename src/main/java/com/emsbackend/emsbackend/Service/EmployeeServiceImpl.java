@@ -1,9 +1,11 @@
 package com.emsbackend.emsbackend.Service;
 
 import com.emsbackend.emsbackend.DTO.EmployeeDTO;
+import com.emsbackend.emsbackend.Entity.Department;
 import com.emsbackend.emsbackend.Entity.Employee;
 import com.emsbackend.emsbackend.Exception.ResourceNotFoundException;
 import com.emsbackend.emsbackend.Mapper.EmployeeMapper;
+import com.emsbackend.emsbackend.Repository.DepartmentRepository;
 import com.emsbackend.emsbackend.Repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,15 +19,21 @@ public class EmployeeServiceImpl implements EmployeeService{
 
     @Autowired
     private EmployeeRepository repository;
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
+
     @Override
     public EmployeeDTO createEmployee(EmployeeDTO employeeDTO) {
         Employee employee = EmployeeMapper.toEmployee(employeeDTO);
+        Department department = departmentRepository.findById(employeeDTO.getDepartmentId()).orElseThrow(() -> new ResourceNotFoundException("Employee does not exist with the given id : "));
+        employee.setDepartment(department);
         Employee savedEmployee = repository.save(employee);
         return EmployeeMapper.toEmployeeDTO(savedEmployee);
     }
 
     @Override
-    public EmployeeDTO getEmployees(Long id) {
+    public EmployeeDTO getEmployees(String id) {
             Employee employee = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Employee does not exist with the given id : " + id));
             return EmployeeMapper.toEmployeeDTO(employee);
     }
@@ -37,9 +45,11 @@ public class EmployeeServiceImpl implements EmployeeService{
     }
 
     @Override
-    public EmployeeDTO updateEmployee(Long id, EmployeeDTO employeeDTO) {
+    public EmployeeDTO updateEmployee(String id, EmployeeDTO employeeDTO) {
         Employee employee = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Employee does not exist with the given id : " + id));
 
+        Department department = departmentRepository.findById(employeeDTO.getDepartmentId()).orElseThrow(() -> new ResourceNotFoundException("Employee does not exist with the given id : "));
+        employee.setDepartment(department);
         if(employeeDTO.getFirstName() != "" && Objects.nonNull(employeeDTO.getFirstName())){
             employee.setFirstName(employeeDTO.getFirstName());
         }
@@ -56,7 +66,7 @@ public class EmployeeServiceImpl implements EmployeeService{
     }
 
     @Override
-    public void deleteEmployee(Long id) {
+    public void deleteEmployee(String id) {
         Employee employee = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Employee does not exist with the given id : " + id));
         repository.delete(employee);
     }
